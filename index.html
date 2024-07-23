@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interactive Divs</title>
+    <style>
+      /* next two rule set to grid view style*/
+      .grid-view {
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      .grid-view > div {
+        width: 100px;
+      }
+
+      .interactive-div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100px;
+        margin: 1px;
+        border: 1px solid #aaa;
+        background-color: #f0f0f0;
+        cursor: pointer;
+      }
+
+      /* this class to visualize what div has clicked state*/
+      .clicked-div {
+        background-color: #ddd;
+      }
+
+      .view-button {
+        position: absolute;
+        right: 10px;
+        top: 5px;
+        height: 40px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- button to change view flow -->
+    <button type="button" class="view-button" onclick="toggleView()">
+      Change view style
+    </button>
+    <script>
+      const body = document.body;
+      const originalPositions = [];
+      const fragment = document.createDocumentFragment();
+
+      for (let i = 1; i <= 100; i++) {
+        const div = document.createElement('div');
+        div.className = 'interactive-div';
+        div.textContent = `div${i}`;
+        div.dataset.index = i - 1;
+        originalPositions.push(div);
+        fragment.appendChild(div);
+      }
+
+      body.appendChild(fragment);
+
+      body.addEventListener('click', (event) => {
+        if (event.target.classList.contains('interactive-div')) {
+          const div = event.target;
+          div.classList.toggle('clicked-div');
+          if (div.dataset.clicked === 'true') {
+            div.dataset.clicked = 'false';
+            moveToOriginalPosition(div);
+          } else {
+            div.dataset.clicked = 'true';
+            moveToFirstPosition(div);
+          }
+        }
+      });
+
+      function moveToOriginalPosition(div) {
+        const currentIndex = originalPositions.indexOf(div);
+        originalPositions.splice(currentIndex, 1);
+        const originalIndex = Number(div.dataset.index);
+        originalPositions.splice(originalIndex, 0, div);
+        updateOrder();
+      }
+
+      function moveToFirstPosition(div) {
+        const currentIndex = originalPositions.indexOf(div);
+        originalPositions.splice(currentIndex, 1);
+        originalPositions.unshift(div);
+        updateOrder();
+      }
+
+      function updateOrder() {
+        originalPositions.forEach((div) => {
+          body.appendChild(div);
+        });
+      }
+
+      function toggleView() {
+        body.classList.toggle('grid-view');
+      }
+    </script>
+  </body>
+</html>
